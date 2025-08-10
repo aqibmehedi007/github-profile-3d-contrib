@@ -1,0 +1,26 @@
+name: Generate 3D Profile
+
+on:
+  schedule:
+    - cron: '0 18 * * *'     # daily at 18:00 UTC (change as desired)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run 3D profile generator
+        uses: yoshi389111/github-profile-3d-contrib@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # or use a PAT secret (see step 4)
+          USERNAME: ${{ github.repository_owner }}
+      - name: Commit & push generated images
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          if git commit -m "chore: update 3d profile"; then git push; fi
